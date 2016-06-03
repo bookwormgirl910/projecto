@@ -29,7 +29,6 @@ var physics_accuracy  = 3,
     cloth_height      = 40,
     cloth_width       = 10,
     start_y           = 20,
-    start_x           = undefined,
     spacing           = 7,
     tear_distance     = 150;
 
@@ -74,21 +73,21 @@ var Point = function (x, y) {
 
 Point.prototype.update = function (delta) {
 
-    // if (mouse.down) {
+    if (mouse.down) {
 
-    //     var diff_x = this.x - mouse.x,
-    //         diff_y = this.y - mouse.y,
-    //         dist = Math.sqrt(diff_x * diff_x + diff_y * diff_y);
+        var diff_x = this.x - mouse.x,
+            diff_y = this.y - mouse.y,
+            dist = Math.sqrt(diff_x * diff_x + diff_y * diff_y);
 
-    //     if (mouse.button == 1) {
+        if (mouse.button == 1) {
 
-    //         if (dist < mouse_influence) {
-    //             this.px = this.x - (mouse.x - mouse.px) * 1.8;
-    //             this.py = this.y - (mouse.y - mouse.py) * 1.8;
-    //         }
+            if (dist < mouse_influence) {
+                this.px = this.x - (mouse.x - mouse.px) * 1.8;
+                this.py = this.y - (mouse.y - mouse.py) * 1.8;
+            }
 
-    //     } else if (dist < mouse_cut) this.constraints = [];
-    // }
+        } else if (dist < mouse_cut) this.constraints = [];
+    }
 
     this.add_force(0, gravity);
 
@@ -260,8 +259,6 @@ function start() {
         mouse.x   = e.clientX - rect.left,
         mouse.y   = e.clientY - rect.top,
         e.preventDefault();
-        start_x = mouse.x;
-        start_y = mouse.y;
     };
 
     canvas.oncontextmenu = function (e) {
