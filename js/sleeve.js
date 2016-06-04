@@ -25,7 +25,7 @@ THE SOFTWARE.
 var physics_accuracy  = 3,
     mouse_influence   = 20,
     mouse_cut         = 0,
-    gravity           = 1200,
+    gravity           = 600,
     cloth_height      = 40,
     cloth_width       = 10,
     start_y           = 20,
@@ -74,21 +74,21 @@ var Point = function (x, y) {
 
 Point.prototype.update = function (delta) {
 
-    if (mouse.down) {
+   //if (mouse.down) {
 
         var diff_x = this.x - mouse.x,
             diff_y = this.y - mouse.y,
             dist = Math.sqrt(diff_x * diff_x + diff_y * diff_y);
 
-        if (mouse.button == 1) {
+        /*if (mouse.button == 1) {
 
             if (dist < mouse_influence) {
                 this.px = this.x - (mouse.x - mouse.px) * 1.8;
                 this.py = this.y - (mouse.y - mouse.py) * 1.8;
             }
 
-        } else if (dist < mouse_cut) this.constraints = [];
-    }
+        } else if (dist < mouse_cut) this.constraints = [];*/
+//    }
 
     // for (var y = 0; y <= cloth_height; y++) {
 
@@ -108,8 +108,8 @@ Point.prototype.update = function (delta) {
     this.add_force(0, gravity);
 
     delta *= delta;
-    nx = this.x + ((this.x - this.px) * .99) + ((this.vx / 2) * delta);
-    ny = this.y + ((this.y - this.py) * .99) + ((this.vy / 2) * delta);
+    nx = this.x + ((this.x - this.px) * .985) + ((this.vx / 2) * delta);
+    ny = this.y + ((this.y - this.py) * .985) + ((this.vy / 2) * delta);
 
     this.px = this.x;
     this.py = this.y;
@@ -131,7 +131,6 @@ Point.prototype.draw = function () {
 Point.prototype.resolve_constraints = function () {
 
     if (this.pin_x != null && this.pin_y != null) {
-
         this.x = this.pin_x;
         this.y = this.pin_y;
         return;
@@ -165,6 +164,14 @@ Point.prototype.add_force = function (x, y) {
 Point.prototype.pin = function (pinx, piny) {
     this.pin_x = pinx;
     this.pin_y = piny;
+};
+
+Point.prototype.stick_to_mouse = function () {
+    this.x = mouse.x;
+    this.y = mouse.y;
+    this.px = mouse.px;
+    this.py = mouse.py;
+    this.pin(mouse.x,mouse.y);
 };
 
 var Constraint = function (p1, p2) {
@@ -211,8 +218,8 @@ var Cloth = function () {
             var p = new Point(start_x + x * spacing, start_y + y * spacing);
 
             x != 0 && p.attach(this.points[this.points.length - 1]);
-            y == 0 && p.pin(p.x, p.y);
-            y != 0 && p.attach(this.points[x + (y - 1) * (cloth_width + 1)])
+            //(y == 0 && x == 0) && p.pin(p.x, p.y); no longer pins to fixed point
+            y != 0 && p.attach(this.points[x + (y - 1) * (cloth_width + 1)]);
 
             this.points.push(p);
         }
@@ -254,6 +261,7 @@ function update() {
 
 function start() {
 
+<<<<<<< HEAD
 
     boundsx = canvas.width - 1;
     boundsy = canvas.height - 1;
@@ -264,6 +272,9 @@ function start() {
   
     update();
 
+=======
+    /*
+>>>>>>> ab88df5fdca81f721d62bbca8993c2b3be460766
     canvas.onmousedown = function (e) {
         mouse.button  = e.which;
         mouse.px      = mouse.x;
@@ -275,17 +286,22 @@ function start() {
         e.preventDefault();
     };
 
+    
     canvas.onmouseup = function (e) {
         mouse.down = false;
         e.preventDefault();
-    };
+    };*/
 
     canvas.onmousemove = function (e) {
         mouse.px  = mouse.x;
         mouse.py  = mouse.y;
         var rect  = canvas.getBoundingClientRect();
-        mouse.x   = e.clientX - rect.left,
-        mouse.y   = e.clientY - rect.top,
+        mouse.x   = e.clientX - rect.left;
+        mouse.y   = e.clientY - rect.top;
+
+        //pin to mouse coordinates
+        cloth.points[cloth_width/2].stick_to_mouse();
+
         e.preventDefault();
         start_x = mouse.x;
         start_y = mouse.y;
