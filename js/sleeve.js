@@ -29,6 +29,7 @@ var physics_accuracy  = 3,
     cloth_height      = 40,
     cloth_width       = 10,
     start_y           = 20,
+    start_x           = undefined,
     spacing           = 7,
     tear_distance     = 150;
 
@@ -88,6 +89,21 @@ Point.prototype.update = function (delta) {
 
         } else if (dist < mouse_cut) this.constraints = [];
     }
+
+    // for (var y = 0; y <= cloth_height; y++) {
+
+    //     for (var x = 0; x <= cloth_width; x++) {
+
+    //         var p = new Point(start_x + x * spacing, start_y + y * spacing);
+
+    //         x != 0 && p.attach(this.points[this.points.length - 1]);
+    //         y == 0 && p.pin(p.x, p.y);
+    //         y != 0 && p.attach(this.points[x + (y - 1) * (cloth_width + 1)])
+
+    //         // this.points.push(p);
+    //     }
+    // }
+    
 
     this.add_force(0, gravity);
 
@@ -183,8 +199,10 @@ Constraint.prototype.draw = function () {
 var Cloth = function () {
 
     this.points = [];
+    console.log(start_y);
+    console.log(start_x);
 
-    var start_x = canvas.width / 2 - cloth_width * spacing / 2;
+    start_x = canvas.width / 2 - cloth_width * spacing / 2;
 
     for (var y = 0; y <= cloth_height; y++) {
 
@@ -236,6 +254,16 @@ function update() {
 
 function start() {
 
+
+    boundsx = canvas.width - 1;
+    boundsy = canvas.height - 1;
+
+    ctx.strokeStyle = '#888';
+  
+    cloth = new Cloth();
+  
+    update();
+
     canvas.onmousedown = function (e) {
         mouse.button  = e.which;
         mouse.px      = mouse.x;
@@ -259,20 +287,15 @@ function start() {
         mouse.x   = e.clientX - rect.left,
         mouse.y   = e.clientY - rect.top,
         e.preventDefault();
+        start_x = mouse.x;
+        start_y = mouse.y;
+        console.log("start_y: " + start_x);
+        console.log("start_x: " + start_y);
     };
 
     canvas.oncontextmenu = function (e) {
         e.preventDefault();
     };
-
-    boundsx = canvas.width - 1;
-    boundsy = canvas.height - 1;
-
-    ctx.strokeStyle = '#888';
-  
-    cloth = new Cloth();
-  
-    update();
 }
 
 window.onload = function () {
