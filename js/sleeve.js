@@ -30,6 +30,7 @@ var physics_accuracy  = 25,
     cloth_height      = 70,
     cloth_width       = 10,
     start_y           = 20,
+    start_x           = undefined,
     spacing           = 7,
     tear_distance     = 150;
 
@@ -203,8 +204,10 @@ Constraint.prototype.draw = function () {
 var Cloth = function () {
 
     this.points = [];
+    console.log(start_y);
+    console.log(start_x);
 
-    var start_x = canvas.width / 2 - cloth_width * spacing / 2;
+    start_x = canvas.width / 2 - cloth_width * spacing / 2;
 
     //create grid of points
     for (var y = 0; y <= cloth_height; y++) {
@@ -262,6 +265,15 @@ function update() {
 /* initialise canvas */ 
 function start() {
 
+    boundsx = canvas.width - 1;
+    boundsy = canvas.height - 1;
+
+    ctx.strokeStyle = '#888';
+  
+    cloth = new Cloth();
+  
+    update();
+
     canvas.onmousemove = function (e) {
         mouse.px  = mouse.x;
         mouse.py  = mouse.y;
@@ -273,20 +285,15 @@ function start() {
         cloth.points[cloth_width/2].stick_to_mouse();
 
         e.preventDefault();
+        start_x = mouse.x;
+        start_y = mouse.y;
+        console.log("start_y: " + start_x);
+        console.log("start_x: " + start_y);
     };
 
     canvas.oncontextmenu = function (e) {
         e.preventDefault();
     };
-
-    boundsx = canvas.width - 1;
-    boundsy = canvas.height - 1;
-
-    ctx.strokeStyle = '#888';
-  
-    cloth = new Cloth();
-  
-    update();
 }
 
 /* initialise window */ 
