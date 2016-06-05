@@ -74,37 +74,12 @@ var Point = function (x, y) {
 
 Point.prototype.update = function (delta) {
 
-   //if (mouse.down) {
 
-        var diff_x = this.x - mouse.x,
-            diff_y = this.y - mouse.y,
-            dist = Math.sqrt(diff_x * diff_x + diff_y * diff_y);
+    var diff_x = this.x - mouse.x,
+        diff_y = this.y - mouse.y,
+        dist = Math.sqrt(diff_x * diff_x + diff_y * diff_y);
 
-        /*if (mouse.button == 1) {
-
-            if (dist < mouse_influence) {
-                this.px = this.x - (mouse.x - mouse.px) * 1.8;
-                this.py = this.y - (mouse.y - mouse.py) * 1.8;
-            }
-
-        } else if (dist < mouse_cut) this.constraints = [];*/
-//    }
-
-    // for (var y = 0; y <= cloth_height; y++) {
-
-    //     for (var x = 0; x <= cloth_width; x++) {
-
-    //         var p = new Point(start_x + x * spacing, start_y + y * spacing);
-
-    //         x != 0 && p.attach(this.points[this.points.length - 1]);
-    //         y == 0 && p.pin(p.x, p.y);
-    //         y != 0 && p.attach(this.points[x + (y - 1) * (cloth_width + 1)])
-
-    //         // this.points.push(p);
-    //     }
-    // }
     
-
     this.add_force(0, gravity);
 
     delta *= delta;
@@ -261,7 +236,6 @@ function update() {
 
 function start() {
 
-<<<<<<< HEAD
 
     boundsx = canvas.width - 1;
     boundsy = canvas.height - 1;
@@ -271,26 +245,6 @@ function start() {
     cloth = new Cloth();
   
     update();
-
-=======
-    /*
->>>>>>> ab88df5fdca81f721d62bbca8993c2b3be460766
-    canvas.onmousedown = function (e) {
-        mouse.button  = e.which;
-        mouse.px      = mouse.x;
-        mouse.py      = mouse.y;
-        var rect      = canvas.getBoundingClientRect();
-        mouse.x       = e.clientX - rect.left,
-        mouse.y       = e.clientY - rect.top,
-        mouse.down    = true;
-        e.preventDefault();
-    };
-
-    
-    canvas.onmouseup = function (e) {
-        mouse.down = false;
-        e.preventDefault();
-    };*/
 
     canvas.onmousemove = function (e) {
         mouse.px  = mouse.x;
