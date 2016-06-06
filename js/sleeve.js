@@ -23,15 +23,15 @@ THE SOFTWARE.
 // settings
 
 //CONSTANTS
-var physics_accuracy  = 25,
+var physics_accuracy  = 20,
     mouse_influence   = 20,
     mouse_cut         = 0,
     gravity           = 300,
-    cloth_height      = 70,
+    cloth_height      = 35,
     cloth_width       = 10,
     start_y           = 20,
     start_x           = undefined,
-    spacing           = 7,
+    spacing           = 15,
     tear_distance     = 150;
 
 window.requestAnimFrame =
@@ -282,7 +282,7 @@ function start() {
         mouse.y   = e.clientY - rect.top;
 
         //pin to mouse coordinates
-        cloth.points[cloth_width/2].stick_to_mouse();
+        cloth.points[5* cloth_width/2].stick_to_mouse();
 
         e.preventDefault();
         start_x = mouse.x;
