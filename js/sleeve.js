@@ -204,16 +204,13 @@ Constraint.prototype.draw = function () {
 var Cloth = function () {
 
     this.points = [];
-    console.log(start_y);
-    console.log(start_x);
 
     start_x = canvas.width / 2 - cloth_width * spacing / 2;
-
+    var count = 0
     //create grid of points
     for (var y = 0; y <= cloth_height; y++) {
 
         for (var x = 0; x <= cloth_width; x++) {
-
             var p = new Point(start_x + x * spacing, start_y + y * spacing);
 
             //create lines between points 
@@ -251,13 +248,38 @@ Cloth.prototype.draw = function () {
     ctx.stroke();
 };
 
+
+/* Uses all points on the perimeter to create a polygon, then fill it*/
+Cloth.prototype.fill = function () {
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    var row = 0; 
+    var col = 0;
+    var count = 0;
+    for(; col < cloth_width; col++) {
+        ctx.lineTo(this.points[col].x,this.points[col].y);
+    }
+    for(; row < cloth_height; row++) {
+        ctx.lineTo(this.points[col + row*(cloth_width+1)].x,this.points[col + row*(cloth_width+1)].y);
+    }
+    for(;col > 0; col--) {
+        ctx.lineTo(this.points[col + row*(cloth_width+1)].x,this.points[col + row*(cloth_width+1)].y);
+    }
+    for(;row > 0; row--) {
+        ctx.lineTo(this.points[col + row*(cloth_width+1)].x,this.points[col + row*(cloth_width+1)].y);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
 /* update canvas */
 function update() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     cloth.update();
-    cloth.draw();
+    //cloth.draw();
+    cloth.fill();
 
     requestAnimFrame(update);
 }
@@ -282,13 +304,11 @@ function start() {
         mouse.y   = e.clientY - rect.top;
 
         //pin to mouse coordinates
-        cloth.points[5* cloth_width/2].stick_to_mouse();
+        cloth.points[3].stick_to_mouse();
 
         e.preventDefault();
         start_x = mouse.x;
         start_y = mouse.y;
-        console.log("start_y: " + start_x);
-        console.log("start_x: " + start_y);
     };
 
     canvas.oncontextmenu = function (e) {
