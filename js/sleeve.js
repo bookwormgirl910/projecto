@@ -23,16 +23,16 @@ THE SOFTWARE.
 // settings
 
 //CONSTANTS
-var physics_accuracy  = 20,
+var physics_accuracy  = 7,
     mouse_influence   = 20,
     mouse_cut         = 0,
-    gravity           = 300,
-    cloth_height      = 35,
-    cloth_width       = 10,
+    gravity           = 250,
+    cloth_height      = 70,
+    cloth_width       = 15,
     start_y           = 20,
-    start_x           = undefined,
-    spacing           = 15,
-    tear_distance     = 150;
+    spacing           = 7,
+    tear_distance     = 150,
+    offset_y = 150; //offset of sleeve spawn point
 
 window.requestAnimFrame =
     window.requestAnimationFrame ||
@@ -98,7 +98,7 @@ Point.prototype.update = function (delta) {
     this.x = nx;
     this.y = ny;
 
-    this.vy = this.vx = 0
+    this.vy = this.vx = 0;
 };
 
 
@@ -184,8 +184,8 @@ Constraint.prototype.resolve = function () {
         dist    = Math.sqrt(diff_x * diff_x + diff_y * diff_y),
         diff    = (this.length - dist) / dist;
 
-    var px = diff_x * diff * 0.2;
-    var py = diff_y * diff * 0.2;
+    var px = diff_x * diff * 0.5;
+    var py = diff_y * diff * 0.5;
 
     this.p1.x += px;
     this.p1.y += py;
@@ -195,9 +195,11 @@ Constraint.prototype.resolve = function () {
 
 /* redraw line */
 Constraint.prototype.draw = function () {
-
+    ctx.strokeStyle = "#888";
+    ctx.beginPath();
     ctx.moveTo(this.p1.x, this.p1.y);
     ctx.lineTo(this.p2.x, this.p2.y);
+    ctx.stroke();
 };
 
 /* define cloth */
@@ -208,15 +210,15 @@ var Cloth = function () {
     start_x = canvas.width / 2 - cloth_width * spacing / 2;
     var count = 0
     //create grid of points
-    for (var y = 0; y <= cloth_height; y++) {
+    for (var y = 0; y < cloth_height; y++) {
 
-        for (var x = 0; x <= cloth_width; x++) {
+        for (var x = 0; x < cloth_width; x++) {
             var p = new Point(start_x + x * spacing, start_y + y * spacing);
 
             //create lines between points 
-            x != 0 && p.attach(this.points[this.points.length - 1]);
+            x != 0 && p.attach(this.points[y*cloth_width + x - 1]);
             //(y == 0 && x == 0) && p.pin(p.x, p.y); no longer pins to fixed point
-            y != 0 && p.attach(this.points[x + (y - 1) * (cloth_width + 1)]);
+            y != 0 && p.attach(this.points[(y-1)*cloth_width + x]);
 
             this.points.push(p);
         }
@@ -240,36 +242,36 @@ Cloth.prototype.update = function () {
 /* redraw all lines & points */
 Cloth.prototype.draw = function () {
 
-    ctx.beginPath();
+    //ctx.beginPath();
 
     var i = cloth.points.length;
     while (i--) cloth.points[i].draw();
 
-    ctx.stroke();
+    //ctx.stroke();
 };
 
 
 /* Uses all points on the perimeter to create a polygon, then fill it*/
 Cloth.prototype.fill = function () {
-    ctx.fillStyle = "#000";
-    ctx.beginPath();
-    var row = 0; 
+    // ctx.beginPath();
+    var row = 1; 
     var col = 0;
     var count = 0;
-    for(; col < cloth_width; col++) {
-        ctx.lineTo(this.points[col].x,this.points[col].y);
+    ctx.fillStyle = "#000";
+    for(var i = 0; i < cloth_height-1 ; i++) {
+        for(var j = 0; j < cloth_width-1; j++) {
+            ctx.beginPath();
+            //console.log(i,j);
+            ctx.moveTo(this.points[j+i*cloth_width].x,this.points[j+i*cloth_width].y);
+            ctx.lineTo(this.points[j+i*cloth_width+1].x,this.points[j+i*cloth_width+1].y);
+            ctx.lineTo(this.points[j+(i+1)*cloth_width+1].x,this.points[j+(i+1)*cloth_width+1].y);
+            ctx.lineTo(this.points[j+(i+1)*cloth_width].x,this.points[j+(i+1)*cloth_width].y);
+            ctx.lineTo(this.points[j+i*cloth_width].x,this.points[j+i*cloth_width].y);
+            ctx.closePath();
+            ctx.fill();      
+                 
+        }
     }
-    for(; row < cloth_height; row++) {
-        ctx.lineTo(this.points[col + row*(cloth_width+1)].x,this.points[col + row*(cloth_width+1)].y);
-    }
-    for(;col > 0; col--) {
-        ctx.lineTo(this.points[col + row*(cloth_width+1)].x,this.points[col + row*(cloth_width+1)].y);
-    }
-    for(;row > 0; row--) {
-        ctx.lineTo(this.points[col + row*(cloth_width+1)].x,this.points[col + row*(cloth_width+1)].y);
-    }
-    ctx.closePath();
-    ctx.fill();
 }
 
 /* update canvas */
@@ -278,7 +280,7 @@ function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     cloth.update();
-    //cloth.draw();
+    cloth.draw();
     cloth.fill();
 
     requestAnimFrame(update);
@@ -304,7 +306,11 @@ function start() {
         mouse.y   = e.clientY - rect.top;
 
         //pin to mouse coordinates
-        cloth.points[3].stick_to_mouse();
+        cloth.points[0].stick_to_mouse();
+        for(var i = 0; i < cloth_width; i++) {
+            cloth.points[i].pin(mouse.x + i*spacing, mouse.y);
+        }
+        
 
         e.preventDefault();
         start_x = mouse.x;
@@ -322,8 +328,8 @@ window.onload = function () {
     canvas  = document.getElementById('c');
     ctx     = canvas.getContext('2d');
 
-    canvas.width  = 1200;
-    canvas.height = 800;
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     start();
 };
